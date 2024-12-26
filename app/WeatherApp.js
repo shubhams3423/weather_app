@@ -39,7 +39,7 @@ const WeatherApp = () => {
   const coordsURL = `${baseUrl}&q=${latitude},${longitude}&days=1&aqi=yes&alerts=no&timestamp=${timestamp}`;
   const searchURL = `${baseUrl}&q=${searchText}&days=1&aqi=yes&alerts=no`;
   const [fetchURL, setFetchURL] = useState(coordsURL);
-  const timeToRecallAPI = 0.5 * 60 * 1000; // 10 mins
+  const timeToRecallAPI = 5 * 60 * 1000;
   const [intervalId, setIntervalId] = useState(0);
   const cityNameRef = useRef(""); // saved the city name to call api after 10 min.
   const intervalCallback = () => {
