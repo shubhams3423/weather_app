@@ -42,7 +42,8 @@
     "react-native-webview": "13.12.2",
     "react-native-pager-view": "6.5.1",
     "expo-location": "~18.0.3",
-    "expo-linear-gradient": "~14.0.1"
+    "expo-linear-gradient": "~14.0.1",
+    "expo-navigation-bar": "~4.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -54,5 +55,18 @@
     "react-test-renderer": "18.3.1",
     "typescript": "^5.3.3"
   },
-  "private": true
+  "private": true,
+  "expo": {
+    "android": {
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "ios": {
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Your location is used to provide personalized services."
+      }
+    }
+  }
 }

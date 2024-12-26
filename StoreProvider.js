@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import * as Location from "expo-location";
-import weatherObj from "./weatherObj";
+import { Alert } from "react-native";
 const WeatherContext = createContext();
 
 const StoreProvider = ({ children }) => {
@@ -8,7 +8,7 @@ const StoreProvider = ({ children }) => {
   const [location, setLocation] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [weatherDetails, setWeatherDetails] = useState({});
-  const [isLoading, setIsLoading] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
   const randomCityNamesArr = [
     "New Mumbai",
@@ -22,22 +22,32 @@ const StoreProvider = ({ children }) => {
     const randomNum = Math.floor(Math.random() * 6);
     return randomCityNamesArr[randomNum];
   };
+
   const getUserLocation = async () => {
-    setIsLoading(true);
-    console.log("fetching current location");
-    const res = await Location.requestForegroundPermissionsAsync();
-    if (res?.status !== "granted") {
+    try {
+      setIsLoading(true);
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setSearchText(getRandomCityName());
+        return;
+      }
+      try {
+        const userLocation = await Location.getCurrentPositionAsync({});
+        if (userLocation) {
+          setLocation(userLocation);
+        }
+      } catch (error) {
+        Alert.alert("Turn on the location to get the current weather.");
+        setSearchText(getRandomCityName());
+      }
+    } catch (error) {
+      if (error.includes("Network Error")) {
+        Alert.alert("Please check your internet connection");
+      }
       setSearchText(getRandomCityName());
-      console.log("permission denied");
-      return;
     }
-    console.log("permission granded");
-    const c = await Location.getCurrentPositionAsync({});
-    if (c.coords) {
-      setLocation(c.coords);
-    }
-    console.log("location fetched");
   };
+
   return (
     <WeatherContext.Provider
       value={{
@@ -54,6 +64,7 @@ const StoreProvider = ({ children }) => {
         setIsLoading,
         isAnimating,
         setIsAnimating,
+        getRandomCityName,
       }}
     >
       {children}

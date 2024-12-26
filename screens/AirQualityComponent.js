@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, ScrollView, StyleSheet, FlatList } from "react-native";
 import React, { useEffect, useState } from "react";
 import GasInfo from "../components/GasInfo";
 
@@ -6,8 +6,8 @@ const AirQualityComponent = ({ weatherDetails }) => {
   const [airQualityConditionText, setAirQualityConditionText] = useState("");
 
   const handleAirQualityText = () => {
-    const text = weatherDetails?.current?.air_quality?.["us-epa-index"];
-    switch (text) {
+    const aqi = weatherDetails?.current?.air_quality?.["us-epa-index"];
+    switch (aqi) {
       case 1:
         return "Good";
       case 2:
@@ -30,33 +30,37 @@ const AirQualityComponent = ({ weatherDetails }) => {
   });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.wrapper}>
-        <View style={styles.aqiWrapper}>
-          <Text style={[styles.text, styles.airQualityText]}>
-            {airQualityConditionText}
-          </Text>
-          <View style={styles.aqiTextWrapper}>
-            <View style={{ marginRight: 4 }}>
-              <Text style={styles.aqiText}>Air Quality Index</Text>
-            </View>
-            <Text style={styles.aqiText}>
-              {weatherDetails?.current?.air_quality?.["us-epa-index"]}{" "}
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <View style={styles.container}>
+        <View style={styles.wrapper}>
+          <View style={styles.aqiWrapper}>
+            <Text style={[styles.text, styles.airQualityText]}>
+              {airQualityConditionText}
             </Text>
+            <View style={styles.aqiTextWrapper}>
+              <View style={{ marginRight: 4 }}>
+                <Text style={styles.aqiText}>Air Quality Index</Text>
+              </View>
+              <Text style={styles.aqiText}>
+                {weatherDetails?.current?.air_quality?.["us-epa-index"]}{" "}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.aqiParameters}>
+            <FlatList
+              contentContainerStyle={{
+                flex: 1,
+                justifyContent: "space-around",
+              }}
+              data={gasArr}
+              renderItem={({ item, key }) => <GasInfo gases={item} key={key} />}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            />
           </View>
         </View>
-        <View style={styles.aqiParameters}>
-          <FlatList
-            data={gasArr}
-            contentContainerStyle={styles.gasList}
-            renderItem={({ item }) => <GasInfo gases={item} />}
-            keyExtractor={(index) => index}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          />
-        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -96,18 +100,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontFamily: "NunitoExtraBold",
   },
-  airCondition: {},
   airIndex: {
     fontSize: 15,
   },
   airGases: {
     gap: 4,
-  },
-  gasList: {
-    // display: "flex",
-    // flexDirection: "row",
-    // justifyContent: "space-around",
-    // paddingHorizontal: 20,
   },
   aqiParameters: {
     width: "100%",

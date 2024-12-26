@@ -1,25 +1,27 @@
 import { View, Text, StyleSheet, SafeAreaView, Animated } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-
 import { FontAwesome } from "@expo/vector-icons";
 import SearchModal from "./SearchModal";
 import { useStore } from "../StoreProvider";
+
 const AppHeader = ({ weatherDetails }) => {
-  const { getUserLocation, setShowModal, isAnimating, setIsAnimating } =
-    useStore();
-  // const [date, setDate] = useState("");
-  // function handleFormateDate() {
-  //   const today = new Date();
-  //   const day = today.getDate();
-  //   const month = today.toString().split(" ")[1];
-  //   const year = today.getFullYear();
-  //   const formattedDate = day + " " + month + ", " + year;
-  //   setDate(formattedDate);
-  // }
-  // useEffect(() => {
-  //   handleFormateDate();
-  // }, []);
+  const { getUserLocation, setShowModal, isAnimating } = useStore();
+  const [date, setDate] = useState("");
+
+  function handleFormateDate() {
+    const today = new Date();
+    const day = today.getDate();
+    const month = today.toString().split(" ")[1];
+    const year = today.getFullYear();
+    const formattedDate = day + " " + month + ", " + year;
+    setDate(formattedDate);
+  }
+
+  useEffect(() => {
+    handleFormateDate();
+  }, []);
+
   const text = "Updating";
   const animatedValues = useRef(
     text.split("").map(() => new Animated.Value(0))
@@ -30,18 +32,16 @@ const AppHeader = ({ weatherDetails }) => {
     if (isAnimating) {
       animation = Animated.loop(
         Animated.stagger(
-          100, // Delay between each letter's animation
+          100,
           animatedValues.map((value, i) =>
             Animated.sequence([
-              // Move current letter up
               Animated.timing(value, {
-                toValue: -4, // Move up
+                toValue: -4,
                 duration: 350,
                 useNativeDriver: true,
               }),
-              // Move current letter down and previous letter up
               Animated.timing(value, {
-                toValue: 0, // Move back to original position
+                toValue: 0,
                 duration: 350,
                 useNativeDriver: true,
               }),
@@ -51,12 +51,11 @@ const AppHeader = ({ weatherDetails }) => {
       );
       animation.start();
     } else {
-      // Reset the animated values when stopping
       Animated.stagger(
         100,
         animatedValues.map((value) =>
           Animated.timing(value, {
-            toValue: 0, // Reset to original position
+            toValue: 0,
             duration: 300,
             useNativeDriver: true,
           })
@@ -66,15 +65,16 @@ const AppHeader = ({ weatherDetails }) => {
 
     return () => {
       if (animation) {
-        animation.stop(); // Stop the animation when component unmounts
+        animation.stop();
       }
     };
   }, [isAnimating]);
+
   return (
     <SafeAreaView>
       <View style={styles.wrapper}>
         <MaterialIcons
-          name="location-on" // more-vert
+          name="location-on"
           size={25}
           color="white"
           onPress={getUserLocation}
@@ -82,24 +82,25 @@ const AppHeader = ({ weatherDetails }) => {
         />
         <View style={styles.header}>
           <Text style={styles.cityName}>{weatherDetails?.location?.name}</Text>
-          <View style={styles.updateTextWrapper}>
-            <View style={styles.currentUpdate} />
-            <View style={styles.container}>
-              {text.split("").map((letter, index) => (
-                <Animated.Text
-                  key={index}
-                  style={[
-                    styles.updatingText,
-                    { transform: [{ translateY: animatedValues[index] }] },
-                  ]}
-                >
-                  {letter}
-                </Animated.Text>
-              ))}
+          <Text style={styles.dateText}>{date}</Text>
+          {isAnimating && (
+            <View style={styles.updateTextWrapper}>
+              <View style={styles.currentUpdate} />
+              <View style={styles.container}>
+                {text.split("").map((letter, index) => (
+                  <Animated.Text
+                    key={index}
+                    style={[
+                      styles.updatingText,
+                      { transform: [{ translateY: animatedValues[index] }] },
+                    ]}
+                  >
+                    {letter}
+                  </Animated.Text>
+                ))}
+              </View>
             </View>
-            {/* <Text style={styles.updatingText}>Updating</Text> */}
-          </View>
-          {/* <Text style={styles.dateText}>{date}</Text> */}
+          )}
         </View>
         <FontAwesome
           color="white"
@@ -108,8 +109,8 @@ const AppHeader = ({ weatherDetails }) => {
           style={styles.icon}
           onPress={() => setShowModal(true)}
         />
-        <SearchModal />
       </View>
+      <SearchModal />
     </SafeAreaView>
   );
 };
@@ -137,16 +138,18 @@ const styles = StyleSheet.create({
     lineHeight: 42.61,
     color: "#FFFFFF",
     fontFamily: "NunitoExtraBold",
-    fontWeight: "700",
+    fontWeight: 500,
     textAlign: "center",
   },
   dateText: {
-    fontSize: 19.99,
+    fontSize: 14.99,
     lineHeight: 27.31,
-    color: "#CACACA",
+    // color: "#CACACA",
+    color: "#aeaeae",
+    fontWeight: 500,
   },
   updateTextWrapper: {
-    marginTop: 8,
+    marginTop: 3,
     paddingHorizontal: 6,
     paddingVertical: 4,
     borderRadius: 10,

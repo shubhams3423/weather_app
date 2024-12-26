@@ -2,7 +2,7 @@ import React from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import ForeCastComponent from "../screens/ForeCastComponent";
 import AirQualityComponent from "../screens/AirQualityComponent";
-import { StyleSheet, View, Text } from "react-native";
+import { View, Text } from "react-native";
 const Tab = createMaterialTopTabNavigator();
 
 const WeatherTabs = ({ weatherDetails }) => {
@@ -18,7 +18,8 @@ const WeatherTabs = ({ weatherDetails }) => {
           maxHeight: 59.97,
         },
         tabBarStyle: {
-          ...styles.tabsWrapper,
+          borderRadius: 14.99,
+          backgroundColor: "rgba(64, 132, 223, 0.2)",
           width: 300,
           margin: "auto",
           borderBottomWidth: 0,
@@ -40,7 +41,9 @@ const WeatherTabs = ({ weatherDetails }) => {
           >
             <Text
               style={{
-                ...styles.tabTextCommonTextStyle,
+                fontSize: 20,
+                lineHeight: 27.31,
+                fontFamily: "NunitoExtraBold",
                 color: focused ? "#FFFFFF" : "#ffffffa1",
                 fontWeight: focused ? "500" : "400",
               }}
@@ -57,7 +60,7 @@ const WeatherTabs = ({ weatherDetails }) => {
       })}
     >
       <Tab.Screen
-        name="ForeCast"
+        name="Forecast"
         children={() => <ForeCastComponent weatherDetails={weatherDetails} />}
       />
       <Tab.Screen
@@ -69,15 +72,3 @@ const WeatherTabs = ({ weatherDetails }) => {
 };
 
 export default WeatherTabs;
-
-const styles = StyleSheet.create({
-  tabsWrapper: {
-    borderRadius: 14.99,
-    backgroundColor: "rgba(64, 132, 223, 0.2)",
-  },
-  tabTextCommonTextStyle: {
-    fontWeight: 400,
-    fontSize: 20,
-    lineHeight: 27.31,
-  },
-});

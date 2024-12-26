@@ -30,7 +30,7 @@ const SearchBox = () => {
           onKeyPress={handleKeyPress}
           onSubmitEditing={handleTextInput}
           underlineColorAndroid="transparent"
-          placeholderTextColor={"rgba(149, 165, 166, 0.8)"}
+          placeholderTextColor="rgba(149, 165, 166, 0.8)"
           style={styles.input}
         />
       </View>

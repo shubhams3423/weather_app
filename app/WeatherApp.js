@@ -8,13 +8,15 @@ import {
   Alert,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
+import * as NavigationBar from "expo-navigation-bar";
 import WeatherTabs from "../components/WeatherTabs";
 import AppHeader from "../components/AppHeader";
 import backgroundImg from "../assets/images/backgroundImg.jpeg";
 import { LinearGradient } from "expo-linear-gradient";
-import { baseUrl } from "../constants/urls";
 import { useStore } from "../StoreProvider";
+
 const WeatherApp = () => {
+  const baseUrl = process.env.EXPO_PUBLIC_BASE_URL;
   const {
     getUserLocation,
     location,
@@ -26,22 +28,26 @@ const WeatherApp = () => {
     setIsLoading,
     isAnimating,
     setIsAnimating,
-    setLocation,
+    getRandomCityName,
   } = useStore();
-  const { longitude, latitude } = location;
-  const coordsURL = `${baseUrl}&q=${latitude},${longitude}&days=1&aqi=yes&alerts=no`;
+
+  const timestamp = Date.now();
+  const { longitude, latitude } = location?.coords ?? {
+    longitude: "",
+    latitude: "",
+  };
+  const coordsURL = `${baseUrl}&q=${latitude},${longitude}&days=1&aqi=yes&alerts=no&timestamp=${timestamp}`;
   const searchURL = `${baseUrl}&q=${searchText}&days=1&aqi=yes&alerts=no`;
   const [fetchURL, setFetchURL] = useState(coordsURL);
-  const timeToRecallAPI = 5 * 60 * 1000; // 10 mins
+  const timeToRecallAPI = 0.5 * 60 * 1000; // 10 mins
   const [intervalId, setIntervalId] = useState(0);
-  const [cityName, setCityName] = useState(""); // saved the city name to call api after 10 min.
-  const cityNameRef = useRef(cityName);
+  const cityNameRef = useRef(""); // saved the city name to call api after 10 min.
   const intervalCallback = () => {
-    const timestamp = Date.now();
     const updateWeatherDataURL = `${baseUrl}&q=${cityNameRef.current}&days=1&aqi=yes&alerts=no&timestamp=${timestamp}`;
     setFetchURL(updateWeatherDataURL);
     setIsAnimating(true);
   };
+
   const handleAPITimer = () => {
     if (intervalId) {
       clearInterval(intervalId);
@@ -49,12 +55,12 @@ const WeatherApp = () => {
     const id = setInterval(intervalCallback, timeToRecallAPI);
     setIntervalId(id);
   };
+
   const getWeatherDetails = async () => {
     if (!isAnimating) {
       setIsLoading(true);
     }
     handleAPITimer();
-    console.log("function called");
     try {
       const res = await fetch(fetchURL);
       const data = await res.json();
@@ -62,8 +68,10 @@ const WeatherApp = () => {
         setWeatherDetails(data);
         setSearchText("");
       } else {
-        setSearchText("");
         Alert.alert(data?.error?.message);
+        if (cityNameRef.current == "") {
+          setSearchText(getRandomCityName()); // only when there is not any previous location.
+        }
       }
     } catch (error) {
       Alert.alert(error);
@@ -75,12 +83,13 @@ const WeatherApp = () => {
   };
 
   useEffect(() => {
-    if (Object.keys(location).length > 0) {
+    if (Object?.keys(location).length > 0) {
       setFetchURL(coordsURL);
     } else {
       getUserLocation();
     }
   }, [location]);
+
   useEffect(() => {
     if (searchText.trim() !== "") {
       setFetchURL(searchURL);
@@ -88,20 +97,20 @@ const WeatherApp = () => {
   }, [searchText]);
 
   useEffect(() => {
-    if (Object.keys(location).length > 0 || searchText !== "") {
+    if (Object?.keys(location).length > 0 || searchText !== "") {
       getWeatherDetails();
     }
   }, [fetchURL]);
 
   useEffect(() => {
-    if (cityName !== "") {
-      cityNameRef.current = cityName;
+    if (Object.keys(weatherDetails).length > 0) {
+      cityNameRef.current = weatherDetails?.location?.name;
     }
-  }, [cityName]);
+  }, [weatherDetails]);
 
   useEffect(() => {
-    setCityName(weatherDetails?.location?.name);
-  }, [weatherDetails]);
+    NavigationBar.setBackgroundColorAsync("#000000");
+  }, []);
 
   return (
     <SafeAreaView style={styles.safeView}>
@@ -114,22 +123,23 @@ const WeatherApp = () => {
           <LinearGradient
             style={styles.linearGradient}
             start={{ x: 1, y: 0 }}
-            end={{ x: 0.2, y: 0.5 }}
-            colors={["rgba(8, 201, 253, 0.6)", "rgba(0, 0, 0, 0)"]}
-          >
-            {isLoading ? (
-              <ActivityIndicator
-                style={styles.loader}
-                size={50}
-                color="white"
-              />
-            ) : (
-              <View style={{ flex: 1 }}>
-                <AppHeader weatherDetails={weatherDetails} />
-                <WeatherTabs weatherDetails={weatherDetails} />
-              </View>
-            )}
-          </LinearGradient>
+            end={{ x: 0.5, y: 0.5 }}
+            colors={[
+              "rgba(8, 200, 253, 0.5)",
+              "rgba(8, 200, 253, 0.38)",
+              "rgba(8, 200, 253, 0.19)",
+              "transparent",
+            ]}
+            locations={[0.22, 0.3, 0.5, 0.9]}
+          />
+          {isLoading ? (
+            <ActivityIndicator style={styles.loader} size={50} color="white" />
+          ) : (
+            <View style={{ flex: 1 }}>
+              <AppHeader weatherDetails={weatherDetails} />
+              <WeatherTabs weatherDetails={weatherDetails} />
+            </View>
+          )}
         </ImageBackground>
       </ScrollView>
     </SafeAreaView>
@@ -140,15 +150,15 @@ export default WeatherApp;
 const styles = StyleSheet.create({
   backgroundWrapper: {
     flex: 1,
-  },
-  loaderOpacity: {
-    opacity: 0.9,
-  },
-  linearGradient: {
-    flex: 1,
     paddingTop: 25,
     paddingRight: 25,
     paddingLeft: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#080A2F",
+  },
+  loaderOpacity: {
+    opacity: 0.8,
   },
   loader: {
     flex: 1,
@@ -157,5 +167,12 @@ const styles = StyleSheet.create({
   },
   safeView: {
     flex: 1,
+  },
+  linearGradient: {
+    position: "absolute",
+    width: "130%",
+    height: "70%",
+    top: -10,
+    right: -10,
   },
 });

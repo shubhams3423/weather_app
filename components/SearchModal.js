@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Modal, StyleSheet, ImageBackground } from "react-native";
+import {
+  View,
+  Modal,
+  StyleSheet,
+  KeyboardAvoidingView,
+  ImageBackground,
+} from "react-native";
 import backgroundImg from "../assets/images/backgroundImg.jpeg";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -13,22 +19,23 @@ const SearchModal = () => {
       animationType="slide"
       onRequestClose={() => setShowModal(false)}
     >
-      <ImageBackground
-        resizeMode="cover"
-        style={styles.modalWrapper}
-        source={backgroundImg}
-      >
-        <LinearGradient
-          style={{
-            flex: 1,
-            paddingTop: 20,
-            paddingRight: 20,
-            paddingLeft: 20,
-          }}
-          start={{ x: 1, y: 0 }}
-          end={{ x: 0.2, y: 0.5 }}
-          colors={["rgba(8, 201, 253, 0.6)", "rgba(0, 0, 0, 0)"]}
+      <KeyboardAvoidingView style={{ flex: 1 }}>
+        <ImageBackground
+          resizeMode="cover"
+          style={styles.modalWrapper}
+          source={backgroundImg}
         >
+          <LinearGradient
+            style={styles.linearGradient}
+            start={{ x: 1, y: 0 }}
+            end={{ x: 0.5, y: 0.5 }}
+            colors={[
+              "rgba(8, 200, 253, 0.5)",
+              "rgba(8, 200, 253, 0.32)",
+              "transparent",
+            ]}
+            locations={[0.22, 0.4, 0.9]}
+          />
           <View>
             <MaterialIcons
               name="keyboard-backspace"
@@ -37,11 +44,9 @@ const SearchModal = () => {
               onPress={() => setShowModal(false)}
             />
           </View>
-          <View>
-            <SearchBox />
-          </View>
-        </LinearGradient>
-      </ImageBackground>
+          <SearchBox />
+        </ImageBackground>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -57,5 +62,15 @@ const styles = StyleSheet.create({
   modalWrapper: {
     backgroundColor: "#04061F",
     flex: 1,
+    paddingTop: 25,
+    paddingRight: 25,
+    paddingLeft: 25,
+  },
+  linearGradient: {
+    position: "absolute",
+    width: "130%",
+    height: "75%",
+    top: -20,
+    right: -20,
   },
 });

@@ -22,7 +22,7 @@ export default GasInfo;
 const styles = StyleSheet.create({
   airGases: {
     gap: 4,
-    paddingHorizontal: 15,
+    paddingHorizontal: 12,
     alignItems: "center",
   },
   text: {
